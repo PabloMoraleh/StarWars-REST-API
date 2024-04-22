@@ -1,19 +1,77 @@
-from flask_sqlalchemy import SQLAlchemy
+import os
+import sys
+from sqlalchemy import Column, ForeignKey, Integer, String
+from sqlalchemy.orm import relationship, declarative_base
+from sqlalchemy import create_engine
+from eralchemy2 import render_er
 
-db = SQLAlchemy()
+Base = declarative_base()
 
-class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    password = db.Column(db.String(80), unique=False, nullable=False)
-    is_active = db.Column(db.Boolean(), unique=False, nullable=False)
+class Usuario(Base):
+    __tablename__ = 'usuario'
+    # Here we define columns for the table person
+    # Notice that each column is also a normal Python instance attribute.
+    id = Column(Integer, primary_key=True)
+    nombre = Column(String(250), nullable=False)
+    apellido = Column(String(250), nullable=False)
+    email = Column(String(250), nullable=False)
+    personajes_favoritos = relationship("Favoritos_personajes")
+    personajes_favoritos_id = Column(Integer, ForeignKey("Favoritos_personajes.id"))
 
-    def __repr__(self):
-        return '<User %r>' % self.username
 
-    def serialize(self):
-        return {
-            "id": self.id,
-            "email": self.email,
-            # do not serialize the password, its a security breach
-        }
+    
+
+
+
+
+
+class Vehiculos(Base):
+    __tablename__ = 'vehiculos'
+    # Here we define columns for the table address.
+    # Notice that each column is also a normal Python instance attribute.
+    id = Column(Integer, primary_key=True)
+    tipo = Column(String(250))
+    pasajeros = Column(String(250))
+    velocidad = Column(String(250), nullable=False)
+
+class Planetas(Base):
+    __tablename__ = 'planetas'
+    # Here we define columns for the table address.
+    # Notice that each column is also a normal Python instance attribute.
+    id = Column(Integer, primary_key=True)
+    tipo = Column(String(250))
+    clima = Column(String(250))
+    gravedad = Column(String(250), nullable=False)
+    
+
+class Personajes(Base):
+    __tablename__ = 'personajes'
+    # Here we define columns for the table address.
+    # Notice that each column is also a normal Python instance attribute.
+    id = Column(Integer, primary_key=True)
+    raza = Column(String(250))
+    altura = Column(String(250))
+    peso = Column(String(250), nullable=False)
+
+
+
+class Favoritos_personajes(Base):
+    __tablename__ = 'Favoritos_personajes'
+    id = Column(Integer, primary_key=True)
+    personajes_id = Column(Integer, ForeignKey('personajes.id'))
+    usuario_id = Column(Integer, ForeignKey('usuario.id'))
+    planetas_id = Column(Integer, ForeignKey('planetas.id'))
+    vehiculos_id = Column(Integer, ForeignKey("vehiculos"))
+    personajes = relationship(Personajes)
+    usuario = relationship(Usuario)
+    planetas = relationship(Planetas)
+    vehiculos = relationship(Vehiculos)
+
+
+    
+
+    def to_dict(self):
+        return {}
+
+## Draw from SQLAlchemy base
+render_er(Base, 'diagram.png')
